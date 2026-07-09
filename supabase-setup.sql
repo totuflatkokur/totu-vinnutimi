@@ -1,5 +1,5 @@
--- Tótu Vinnutími PRO v2.0
--- Örugg uppfærsla. Eyðir EKKI gömlum gögnum.
+-- Tótu Vinnutími PRO v2.1
+-- Örugg PIN uppfærsla. Eyðir EKKI gömlum gögnum.
 
 create table if not exists employees (
   id uuid primary key default gen_random_uuid(),
@@ -8,6 +8,8 @@ create table if not exists employees (
   national_id text,
   employee_no text,
   pin_code text,
+  pin_hash text,
+  must_change_pin boolean default false,
   hourly_rate numeric default 0,
   created_at timestamptz default now()
 );
@@ -41,6 +43,8 @@ alter table employees add column if not exists active boolean default true;
 alter table employees add column if not exists national_id text;
 alter table employees add column if not exists employee_no text;
 alter table employees add column if not exists pin_code text;
+alter table employees add column if not exists pin_hash text;
+alter table employees add column if not exists must_change_pin boolean default false;
 alter table employees add column if not exists hourly_rate numeric default 0;
 
 alter table time_entries add column if not exists paid_minutes integer;
@@ -60,8 +64,10 @@ insert into app_settings (key, value) values
 on conflict (key) do nothing;
 
 update employees
-set pin_code = '1234'
-where pin_code is null or pin_code = '';
+set pin_code = '1234',
+    must_change_pin = true
+where (pin_code is null or pin_code = '')
+  and (pin_hash is null or pin_hash = '');
 
 alter table employees enable row level security;
 alter table time_entries enable row level security;

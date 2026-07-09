@@ -1,24 +1,10 @@
-# Tótu Vinnutími PRO v2.0
+# Tótu Vinnutími PRO v2.1
 
-Hreinni útgáfa með skiptum skrám.
+Nýtt:
+- Starfsmenn geta breytt PIN sjálfir
+- Stjórnandi getur endurstillt PIN
+- Nýtt PIN vistast sem SHA-256 hash
+- Starfsmenn með tímabundið PIN þurfa að velja nýtt PIN
+- Sjálfgefið tímabundið PIN: 1234
 
-## Skrár
-- index.html
-- style.css
-- app.js
-- supabase.js
-- manifest.json
-- icon-192.png
-- icon-512.png
-- supabase-setup.sql
-
-## Stjórnandi
-Lykilorð: `Brynjak`
-
-## Starfsmenn
-Sjálfgefið PIN fyrir eldri starfsmenn: `1234`
-
-## Uppsetning
-1. Keyrðu `supabase-setup.sql` í Supabase SQL Editor.
-2. Hladdu öllum skránum inn í GitHub.
-3. Netlify uppfærir síðuna sjálfkrafa.
+Stjórnandalykilorð: `Brynjak`
