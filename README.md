@@ -1,22 +1,21 @@
-# TótuOS Enterprise v5
+# Tótu Stimpilklukka v1
 
-Hreinn pakki. Notaðu aðeins þessar skrár:
+Hreint nýtt app — bara stimpilklukka.
+
+## Skrár
 - index.html
 - style.css
 - app.js
 - supabase.js
-- manifest.json
-- icon-192.png / icon-512.png ef þú átt þær
-
-Ekki nota:
-- AdminDashboard.tsx
-- supabaseClient.ts
-- v7 skrár
-- Word skjöl
+- supabase_stimpilklukka_v1.sql
 
 ## Uppsetning
-1. Settu publishable key í `supabase.js`.
-2. Keyrðu `supabase_v5.sql` í Supabase SQL Editor.
-3. Settu `index.html`, `style.css`, `app.js`, `supabase.js` yfir í GitHub.
+1. Keyrðu `supabase_stimpilklukka_v1.sql` í Supabase SQL Editor.
+2. Settu publishable key í `supabase.js`.
+3. Settu skrárnar í nýtt GitHub repo eða hreinsað gamla repo.
 4. Commit changes.
-5. Netlify deployar sjálfkrafa.
+5. Netlify deployar.
+
+## Innskráning stjórnanda
+Sjálfgefið lykilorð er `1234`.
+Breyttu því í `supabase.js`.
