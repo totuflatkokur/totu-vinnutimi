@@ -1,24 +1,22 @@
-# TótuOS Enterprise v4.0
+# TótuOS Enterprise v5
 
-Þetta er hreinn pakki fyrir Netlify/GitHub verkefnið.
-
-## Skrár
+Hreinn pakki. Notaðu aðeins þessar skrár:
 - index.html
 - style.css
 - app.js
 - supabase.js
-- supabase_v4.sql
+- manifest.json
+- icon-192.png / icon-512.png ef þú átt þær
 
-## Mikilvægt
-Ef gamla `supabase.js` hjá þér virkar, haltu henni frekar.
-Ef þú notar þessa nýju `supabase.js`, settu inn rétt:
-- SUPABASE_URL
-- SUPABASE_ANON_KEY
-- ADMIN_PASSWORD
+Ekki nota:
+- AdminDashboard.tsx
+- supabaseClient.ts
+- v7 skrár
+- Word skjöl
 
 ## Uppsetning
-1. Keyrðu `supabase_v4.sql` í Supabase SQL Editor.
-2. Settu `index.html`, `style.css` og `app.js` yfir gömlu skrárnar í GitHub.
-3. Ekki eyða gamla `supabase.js` nema þú ætlir að setja Supabase URL og key inn aftur.
+1. Settu publishable key í `supabase.js`.
+2. Keyrðu `supabase_v5.sql` í Supabase SQL Editor.
+3. Settu `index.html`, `style.css`, `app.js`, `supabase.js` yfir í GitHub.
 4. Commit changes.
-5. Netlify deploy-ar sjálfkrafa.
+5. Netlify deployar sjálfkrafa.
