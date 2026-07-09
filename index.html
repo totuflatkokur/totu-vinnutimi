@@ -3,154 +3,87 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>TótuOS Enterprise v5</title>
+  <title>Tótu Stimpilklukka</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <div id="toast" class="toast hidden"></div>
 
   <main class="app">
-    <header class="top">
-      <div class="logo">Tótu<br><small>OS</small></div>
-      <div>
-        <h1>TótuOS<br>Enterprise</h1>
-        <p>V5.0 · vinnutími · pantanir · framleiðsla</p>
-      </div>
-      <button id="adminBtn" class="topAdmin">Stjórnandi</button>
+    <header class="hero">
+      <div class="logo">Tótu<br><small>Stimpilklukka</small></div>
+      <h1>Tótu Stimpilklukka</h1>
+      <p>Einföld mæting og heimferð</p>
     </header>
 
     <nav class="nav">
-      <button class="navBtn active" data-page="home">🏠 Heim</button>
-      <button class="navBtn" data-page="time">⏰ Vinnutími</button>
-      <button class="navBtn" data-page="orders">📦 Pantanir</button>
-      <button class="navBtn" data-page="production">🍞 Framleiðsla</button>
-      <button class="navBtn" data-page="stores">🏪 Verslanir</button>
+      <button class="navBtn active" data-page="clock">⏰ Stimpilklukka</button>
       <button class="navBtn" data-page="admin">👨‍💼 Stjórnandi</button>
     </nav>
 
-    <section id="page-home" class="page">
-      <div class="card"><h2>Yfirlit dagsins</h2><div id="homeStats" class="statgrid"></div></div>
-      <div class="card"><h2>🟢 Í vinnu núna</h2><div id="openEntries"></div></div>
-      <div class="card"><h2>📦 Pantanir í dag</h2><div id="todayOrders"></div></div>
-      <div class="card"><h2>🍞 Framleiðsla</h2><div id="productionStatus"></div></div>
-    </section>
-
-    <section id="page-time" class="page hidden">
+    <section id="page-clock" class="page">
       <div class="card">
-        <h2>⏰ Vinnutími</h2>
-        <div id="timeDashboard" class="statgrid"></div>
+        <h2>Starfsmaður</h2>
 
-        <label>Starfsmaður</label>
+        <label>Veldu starfsmann</label>
         <select id="employeeSelect"></select>
+
         <label>PIN</label>
-        <input id="employeePin" type="password" inputmode="numeric" placeholder="PIN">
-        <button id="employeeLoginBtn">Skrá inn</button>
+        <input id="pinInput" type="password" inputmode="numeric" placeholder="Sláðu inn PIN">
+
+        <button id="loginBtn">Skrá inn</button>
 
         <div id="employeePanel" class="hidden">
-          <h3 id="loggedEmployeeName"></h3>
-          <button id="clockInBtn" class="green">Mæta</button>
-          <button id="clockOutShowBtn" class="orange">Fara heim</button>
-          <button id="employeeLogoutBtn" class="secondary">Útskrá</button>
+          <h2 id="employeeName"></h2>
+          <div id="currentStatus" class="statusBox"></div>
 
-          <div id="clockOutBox" class="box hidden">
-            <label><input type="checkbox" id="firstCoffee" checked> Fyrra kaffi tekið</label>
-            <label><input type="checkbox" id="secondCoffee" checked> Seinna kaffi tekið</label>
-            <label><input type="checkbox" id="lunch" checked> Matur tekinn</label>
-            <p id="paidPreview"></p>
-            <button id="clockOutBtn" class="orange">Staðfesta heimferð</button>
-          </div>
+          <button id="clockInBtn" class="green">🟢 Mæta</button>
+          <button id="clockOutBtn" class="orange">🔴 Fara heim</button>
+          <button id="logoutBtn" class="secondary">Útskrá</button>
         </div>
       </div>
-    </section>
-
-    <section id="page-orders" class="page hidden">
-      <div class="card">
-        <h2>📦 Pantanir</h2>
-        <input id="orderDate" type="date">
-        <select id="orderCustomer"></select>
-        <input id="orderPacks" type="number" placeholder="Pakkar">
-        <input id="orderItems" type="number" placeholder="Stykki">
-        <button id="addOrderBtn">Bæta við pöntun</button>
-        <button id="copyYesterdayBtn" class="secondary">Afrita gærdaginn</button>
-        <button id="exportOrdersBtn" class="secondary">Export CSV</button>
-      </div>
-      <div class="card"><h2>Pantanir</h2><div id="ordersList"></div></div>
-    </section>
-
-    <section id="page-production" class="page hidden">
-      <div class="card">
-        <h2>🍞 Framleiðsla</h2>
-        <input id="productionDate" type="date">
-        <input id="productionTarget" type="number" placeholder="Markmið pakkar">
-        <button id="saveProductionTargetBtn">Vista markmið</button>
-        <button id="addDoughBtn">+ Deig</button>
-        <button id="addBakedBtn">+ 100 bakað</button>
-        <button id="addPackedBtn">+ 50 pakkað</button>
-        <button id="loadTruckBtn">+ Bíll hlaðinn</button>
-      </div>
 
       <div class="card">
-        <h2>📋 Verkefni</h2>
-        <input id="taskDate" type="date">
-        <input id="taskTitle" placeholder="Verkefni">
-        <select id="taskEmployee"></select>
-        <button id="addTaskBtn">Bæta við verkefni</button>
-        <div id="tasksList"></div>
+        <h2>Í vinnu núna</h2>
+        <div id="workingNowList"></div>
       </div>
-
-      <div class="card">
-        <h2>📦 Lager</h2>
-        <input id="inventoryName" placeholder="Vara">
-        <input id="inventoryUnit" placeholder="Eining">
-        <input id="inventoryQty" type="number" placeholder="Magn">
-        <input id="inventoryMin" type="number" placeholder="Lágmark">
-        <button id="addInventoryBtn">Bæta í lager</button>
-        <div id="inventoryList"></div>
-      </div>
-    </section>
-
-    <section id="page-stores" class="page hidden">
-      <div class="card">
-        <h2>🏪 Verslanir</h2>
-        <input id="customerName" placeholder="Nafn verslunar">
-        <input id="customerChain" placeholder="Keðja">
-        <input id="customerRoute" placeholder="Leið">
-        <button id="addCustomerBtn">Bæta við verslun</button>
-      </div>
-      <div class="card"><h2>Verslanalisti</h2><div id="customersList"></div></div>
     </section>
 
     <section id="page-admin" class="page hidden">
-      <div class="card" id="adminLogin">
+      <div id="adminLogin" class="card">
         <h2>Stjórnandi</h2>
-        <input id="adminPassword" type="password" placeholder="Lykilorð">
-        <button id="adminLoginBtn">Innskrá stjórnanda</button>
+        <input id="adminPassword" type="password" placeholder="Lykilorð stjórnanda">
+        <button id="adminLoginBtn">Innskrá</button>
       </div>
 
       <div id="adminPanel" class="hidden">
         <div class="card">
-          <h2>Stjórnborð</h2>
-          <button id="backupBtn">💾 Sækja backup</button>
-          <button id="payrollCsvBtn">💰 Launa CSV</button>
-        </div>
-
-        <div class="card">
-          <h2>📊 Mánaðaryfirlit starfsmanna</h2>
-          <div class="row">
-            <select id="adminMonth"></select>
-            <select id="adminYear"></select>
+          <h2>Yfirlit</h2>
+          <div class="stats">
+            <div class="stat"><span>Starfsmenn</span><b id="statEmployees">0</b></div>
+            <div class="stat"><span>Í vinnu</span><b id="statWorking">0</b></div>
+            <div class="stat"><span>Tímar í mánuði</span><b id="statMonthHours">0</b></div>
           </div>
-          <input id="adminSearch" placeholder="Leita að starfsmanni">
-          <button id="refreshMonthlyBtn" class="secondary">Endurhlaða</button>
-          <button id="monthlyCsvBtn" class="secondary">CSV mánaðaryfirlit</button>
-          <div id="monthlyStats" class="statgrid"></div>
-          <div id="monthlyList"></div>
         </div>
 
         <div class="card">
-          <h2>🟢 Í vinnu núna</h2>
-          <div id="liveStatusList"></div>
+          <h2>Starfsmenn</h2>
+          <input id="newEmployeeName" placeholder="Nafn starfsmanns">
+          <input id="newEmployeePin" placeholder="PIN" inputmode="numeric">
+          <button id="addEmployeeBtn">Bæta við starfsmanni</button>
+          <div id="employeesList"></div>
+        </div>
+
+        <div class="card">
+          <h2>Mánaðaryfirlit</h2>
+          <div class="row">
+            <select id="monthSelect"></select>
+            <select id="yearSelect"></select>
+          </div>
+          <button id="refreshBtn" class="secondary">Endurhlaða</button>
+          <button id="payrollCsvBtn" class="secondary">Sækja launa CSV</button>
+          <button id="backupBtn" class="secondary">Sækja backup</button>
+          <div id="monthlyList"></div>
         </div>
       </div>
     </section>
