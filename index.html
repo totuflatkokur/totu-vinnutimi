@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>TótuOS Enterprise v3.0</title>
+  <title>TótuOS Enterprise v3.1</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" />
   <meta name="theme-color" content="#0091ff" />
@@ -17,7 +17,7 @@
       <img src="icon-192.png" class="logo" />
       <div>
         <h1>TótuOS Enterprise</h1>
-        <p>v3.0 · vinnutími · pantanir · framleiðsla</p>
+        <p>v3.1 · vinnutími · pantanir · framleiðsla · verkefni · lager</p>
       </div>
     </div>
     <button id="adminBtn" class="secondary">Stjórnandi</button>
@@ -28,6 +28,8 @@
     <button class="navBtn" data-page="time">⏰ Vinnutími</button>
     <button class="navBtn" data-page="orders">📦 Pantanir</button>
     <button class="navBtn" data-page="production">🍞 Framleiðsla</button>
+    <button class="navBtn" data-page="tasks">✅ Verkefni</button>
+    <button class="navBtn" data-page="inventory">🏭 Lager</button>
     <button class="navBtn" data-page="customers">🏪 Verslanir</button>
     <button class="navBtn" data-page="admin">👨‍💼 Stjórnandi</button>
   </nav>
@@ -46,6 +48,14 @@
         <div class="card">
           <h2>📦 Pantanir dagsins</h2>
           <div id="todayOrders"></div>
+        </div>
+        <div class="card">
+          <h2>✅ Verkefni dagsins</h2>
+          <div id="todayTasks"></div>
+        </div>
+        <div class="card">
+          <h2>🏭 Lageraðvaranir</h2>
+          <div id="inventoryWarnings"></div>
         </div>
         <div class="card wide">
           <h2>🍞 Framleiðslustaða</h2>
@@ -122,6 +132,35 @@
           <button class="big green" id="addPackedBtn">📦 Pakkað +50</button>
           <button class="big secondary" id="loadTruckBtn">🚚 Komið í bíl</button>
         </div>
+      </div>
+    </section>
+
+    <section id="page-tasks" class="page hidden">
+      <div class="card">
+        <h2>✅ Verkefnalisti</h2>
+        <div class="row">
+          <input id="taskDate" type="date">
+          <input id="taskTitle" placeholder="Verkefni, t.d. Þrífa vél">
+          <select id="taskEmployee"></select>
+          <button id="addTaskBtn">Bæta við</button>
+        </div>
+        <h3>Verkefni dagsins</h3>
+        <div id="tasksList"></div>
+      </div>
+    </section>
+
+    <section id="page-inventory" class="page hidden">
+      <div class="card">
+        <h2>🏭 Lager</h2>
+        <div class="row">
+          <input id="inventoryName" placeholder="Vara, t.d. Hveiti">
+          <input id="inventoryUnit" placeholder="Eining, t.d. pokar">
+          <input id="inventoryQty" type="number" placeholder="Magn">
+          <input id="inventoryMin" type="number" placeholder="Lágmark">
+          <button id="addInventoryBtn">Bæta við</button>
+        </div>
+        <h3>Lagerstaða</h3>
+        <div id="inventoryList"></div>
       </div>
     </section>
 

@@ -1,60 +1,54 @@
--- TótuOS Enterprise v3.0
--- Örugg uppfærsla. Eyðir EKKI gömlum gögnum.
+-- TótuOS Enterprise v3.1
+-- Verkefni + Lager. Örugg uppfærsla, eyðir EKKI gömlum gögnum.
 
-create table if not exists customers (
+create table if not exists tasks (
+  id uuid primary key default gen_random_uuid(),
+  task_date date not null,
+  title text not null,
+  description text,
+  employee_id uuid references employees(id),
+  status text default 'Opið',
+  completed_at timestamptz,
+  created_at timestamptz default now()
+);
+
+create table if not exists inventory_items (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  chain text,
-  route text,
-  contact_name text,
-  phone text,
-  email text,
+  unit text,
+  quantity numeric default 0,
+  min_quantity numeric default 0,
+  location text,
+  note text,
   active boolean default true,
   created_at timestamptz default now()
 );
 
-create table if not exists orders (
-  id uuid primary key default gen_random_uuid(),
-  order_date date not null,
-  customer_id uuid references customers(id),
-  packs integer default 0,
-  items integer default 0,
-  status text default 'Skráð',
-  note text,
-  created_at timestamptz default now()
-);
+alter table tasks enable row level security;
+alter table inventory_items enable row level security;
 
-create table if not exists production_days (
-  id uuid primary key default gen_random_uuid(),
-  work_date date unique not null,
-  target_packs integer default 0,
-  dough_count integer default 0,
-  baked_packs integer default 0,
-  packed_packs integer default 0,
-  loaded_trucks integer default 0,
-  note text,
-  created_at timestamptz default now()
-);
+drop policy if exists "allow all tasks" on tasks;
+drop policy if exists "allow all inventory items" on inventory_items;
 
-alter table customers enable row level security;
-alter table orders enable row level security;
-alter table production_days enable row level security;
+create policy "allow all tasks" on tasks for all using (true) with check (true);
+create policy "allow all inventory items" on inventory_items for all using (true) with check (true);
 
-drop policy if exists "allow all customers" on customers;
-drop policy if exists "allow all orders" on orders;
-drop policy if exists "allow all production days" on production_days;
+insert into tasks (task_date, title)
+select current_date, title from (values
+('Hnoða deig 1'),
+('Baka fyrstu lotu'),
+('Pakka fyrstu sendingu'),
+('Hlaða bíl'),
+('Þrífa vél eftir vinnu')
+) as v(title)
+where not exists (select 1 from tasks where task_date = current_date);
 
-create policy "allow all customers" on customers for all using (true) with check (true);
-create policy "allow all orders" on orders for all using (true) with check (true);
-create policy "allow all production days" on production_days for all using (true) with check (true);
-
--- Gæti bætt við upphafsverslunum ef taflan er tóm.
-insert into customers (name, chain, route)
+insert into inventory_items (name, unit, quantity, min_quantity)
 select * from (values
-('Smáratorg','Bónus','Reykjavík'),
-('Norðlingaholt','Bónus','Reykjavík'),
-('Skeifan','Hagkaup','Reykjavík'),
-('Mjódd','Samkaup','Reykjavík'),
-('Mosfellsbær','Bónus','Norður')
-) as v(name, chain, route)
-where not exists (select 1 from customers);
+('Hveiti','pokar',0,20),
+('Salt','kg',0,10),
+('Pökkunarplast','rúllur',0,5),
+('Merkimiðar','rúllur',0,5),
+('Brettaplast','rúllur',0,3)
+) as v(name, unit, quantity, min_quantity)
+where not exists (select 1 from inventory_items);

@@ -1,12 +1,11 @@
-# TótuOS Enterprise v3.0
+# TótuOS Enterprise v3.1
 
-Fyrsta útgáfa af rekstrarkerfi:
-- Heimaskjár / morgunstjórnborð
-- Vinnutími
-- Pantanir
-- Verslanir
-- Framleiðsla
-- Backup
+Nýtt:
+- Verkefnalisti dagsins
+- Klára verkefni
+- Lagerkerfi
+- Lágmarksbirgðir
+- Lageraðvaranir á heimaskjá
 
 ## Uppsetning
 1. Keyrðu `supabase-setup.sql` í Supabase.
