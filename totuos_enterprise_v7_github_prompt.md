@@ -1,0 +1,81 @@
+# TótuOS Enterprise v7.0 — GitHub Copilot Prompt
+
+Upgrade TótuOS Enterprise to v7.0.
+
+Build a complete Admin Dashboard without removing existing features.
+
+Keep existing buttons:
+- Backup
+- Payroll CSV
+
+Add these admin modules:
+
+## 1. Employee Monthly Hours
+- Month and year selector
+- Search employee
+- Show total hours, regular hours, overtime, shift count, last shift and status
+- Click employee to see all shifts for selected month
+- Export CSV and PDF
+
+## 2. Employee Management
+- Add, edit and deactivate employees
+- Set employee PIN/password
+- Show active/inactive employees
+- Prevent deleting employees with time records
+
+## 3. Live Clock Status
+- Show who is clocked in now
+- Show clock-in time and current duration
+- Admin can manually clock employee out if needed
+
+## 4. Payroll Dashboard
+- Calculate monthly pay using hourly rate
+- Show regular pay, overtime pay and total pay
+- Export payroll CSV
+
+## 5. Time Entry Corrections
+- Admin can edit wrong clock-in or clock-out times
+- Add reason for correction
+- Save audit log of all corrections
+
+## 6. Reports
+- Monthly report
+- Employee report
+- Overtime report
+- Missing clock-out report
+- Export CSV and PDF
+
+## 7. Dashboard Stats
+- Total hours this month
+- Total employees active
+- Employees working now
+- Total overtime this month
+- Missing clock-outs
+
+## Backend
+Use Supabase as backend.
+Use existing Supabase client.
+Use existing tables if possible.
+If table or column names differ, inspect the current schema and adapt.
+
+Do not break:
+- Login
+- Time clock
+- Orders
+- Production
+- Stores
+- Backup
+- Payroll CSV
+
+## Design
+- Mobile first
+- Dark blue TótuOS Enterprise style
+- Large rounded buttons
+- Clear cards and tables
+- Icelandic labels in the UI
+
+## Code
+Use TypeScript.
+Keep code clean and follow the existing project structure.
+Add loading states and error messages.
+Handle missing clock_out safely by showing "Í vinnu núna".
