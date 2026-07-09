@@ -1,10 +1,11 @@
--- Tótu Vinnutími PRO v1.2
--- Örugg uppfærsla. Eyðir EKKI gömlum gögnum.
+-- Tótu Vinnutími PRO v1.3
+-- PIN innskráning starfsmanna. Eyðir EKKI gögnum.
 
 alter table employees add column if not exists national_id text;
 alter table employees add column if not exists employee_no text;
 alter table employees add column if not exists hourly_rate numeric default 0;
 alter table employees add column if not exists active boolean default true;
+alter table employees add column if not exists pin_code text;
 
 alter table time_entries add column if not exists paid_minutes integer;
 alter table time_entries add column if not exists skipped_break_minutes integer default 0;
@@ -27,3 +28,7 @@ insert into app_settings (key, value) values
 ('lunch_minutes', '30'),
 ('overtime_after_hours_day', '8')
 on conflict (key) do nothing;
+
+update employees
+set pin_code = '1234'
+where pin_code is null or pin_code = '';

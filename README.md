@@ -1,10 +1,9 @@
-# Tótu Vinnutími PRO v1.2
+# Tótu Vinnutími PRO v1.3
 
 Nýtt:
-- Kennitala
-- Starfsnúmer
-- Tímakaup
-- Áætluð laun í mánaðaryfirliti
-- Betri CSV/Excel fyrir laun
+- PIN innskráning starfsmanna
+- Starfsmenn þurfa PIN til að mæta/fara heim
+- Sjálfgefið PIN verður 1234 fyrir eldri starfsmenn
+- Stjórnandi getur breytt PIN hjá hverjum starfsmanni
 
 Stjórnandalykilorð: `Brynjak`

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Tótu Vinnutími PRO v1.2</title>
+<title>Tótu Vinnutími PRO v1.3</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <meta name="theme-color" content="#0091ff">
@@ -22,35 +22,49 @@ button{border:0;border-radius:18px;padding:15px 18px;font-weight:900;font-size:1
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}th{color:#cdd8ea}.tablewrap{overflow:auto}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#092615;border:1px solid #1bd783;color:#dfffea;padding:16px 18px;border-radius:18px;box-shadow:0 12px 50px #0008;z-index:20;font-weight:900}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tab{background:#13233d}.tab.active{background:var(--blue)}
-.checkrow{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0}.check{display:flex;gap:10px;align-items:center;background:#081120;border:1px solid var(--line);border-radius:16px;padding:12px}.check input{width:auto}.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(min-width:900px){.statgrid{grid-template-columns:repeat(4,1fr)}}.stat{background:#081120;border:1px solid var(--line);border-radius:20px;padding:14px}.stat b{display:block;font-size:24px;margin-top:4px}.preview{background:#07182b;border:1px solid #17426e;border-radius:18px;padding:13px;margin-top:10px}
+.checkrow{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0}.check{display:flex;gap:10px;align-items:center;background:#081120;border:1px solid var(--line);border-radius:16px;padding:12px}.check input{width:auto}.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(min-width:900px){.statgrid{grid-template-columns:repeat(4,1fr)}}.stat{background:#081120;border:1px solid var(--line);border-radius:20px;padding:14px}.stat b{display:block;font-size:24px;margin-top:4px}.preview{background:#07182b;border:1px solid #17426e;border-radius:18px;padding:13px;margin-top:10px}.loginStatus{background:#081120;border:1px solid var(--line);border-radius:18px;padding:12px;margin-top:10px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
-    <div class="brand"><img class="logo" src="icon-192.png"><div class="title"><h1>Tótu Vinnutími PRO</h1><p>v1.2 — laun, kennitala og betra mánaðaryfirlit</p></div></div>
+    <div class="brand"><img class="logo" src="icon-192.png"><div class="title"><h1>Tótu Vinnutími PRO</h1><p>v1.3 — PIN innskráning starfsmanna</p></div></div>
     <button class="secondary" onclick="toggleAdmin()">Stjórnandi</button>
   </div>
 
   <div class="grid">
     <section class="card">
       <h2>Starfsmaður</h2>
-      <label>Veldu nafn</label>
-      <select id="employeeSelect"></select>
-      <div class="row" style="margin-top:14px">
-        <button class="green big" onclick="clockIn()">🟢 MÆTA</button>
-        <button class="red big" onclick="showClockOut()">🔴 FARA HEIM</button>
+
+      <div id="employeeLoginBox">
+        <label>Veldu nafn</label>
+        <select id="employeeSelect"></select>
+        <label>PIN</label>
+        <input id="employeePin" type="password" inputmode="numeric" maxlength="4" placeholder="4 stafa PIN">
+        <button style="margin-top:12px" onclick="employeeLogin()">Innskrá</button>
+        <p class="muted small">Starfsmaður þarf PIN til að stimpla sig inn eða út.</p>
       </div>
-      <div id="clockOutBox" class="hidden" style="margin-top:16px">
-        <h3>Var allt rétt í dag?</h3>
-        <p class="muted">Hakaðu við hléin sem þú TÓKST. Ef hlé var ekki tekið bætist tíminn við greiddar klst.</p>
-        <div class="checkrow">
-          <label class="check"><input id="firstCoffee" type="checkbox" checked onchange="previewPaid()"> Ég tók fyrra kaffi (<span data-setting="first_coffee_minutes">15</span> mín)</label>
-          <label class="check"><input id="secondCoffee" type="checkbox" checked onchange="previewPaid()"> Ég tók seinna kaffi (<span data-setting="second_coffee_minutes">15</span> mín)</label>
-          <label class="check"><input id="lunch" type="checkbox" checked onchange="previewPaid()"> Ég tók hádegismat (<span data-setting="lunch_minutes">30</span> mín)</label>
+
+      <div id="employeeWorkBox" class="hidden">
+        <div class="loginStatus">
+          Innskráður starfsmaður: <b id="loggedEmployeeName"></b>
+          <button class="secondary" style="float:right;padding:8px 12px" onclick="employeeLogout()">Útskrá</button>
         </div>
-        <div id="paidPreview" class="preview">Sæki opna skráningu...</div>
-        <button class="red" onclick="clockOut()">Vista og fara heim</button>
+        <div class="row" style="margin-top:14px">
+          <button class="green big" onclick="clockIn()">🟢 MÆTA</button>
+          <button class="red big" onclick="showClockOut()">🔴 FARA HEIM</button>
+        </div>
+        <div id="clockOutBox" class="hidden" style="margin-top:16px">
+          <h3>Var allt rétt í dag?</h3>
+          <p class="muted">Hakaðu við hléin sem þú TÓKST. Ef hlé var ekki tekið bætist tíminn við greiddar klst.</p>
+          <div class="checkrow">
+            <label class="check"><input id="firstCoffee" type="checkbox" checked onchange="previewPaid()"> Ég tók fyrra kaffi (<span data-setting="first_coffee_minutes">15</span> mín)</label>
+            <label class="check"><input id="secondCoffee" type="checkbox" checked onchange="previewPaid()"> Ég tók seinna kaffi (<span data-setting="second_coffee_minutes">15</span> mín)</label>
+            <label class="check"><input id="lunch" type="checkbox" checked onchange="previewPaid()"> Ég tók hádegismat (<span data-setting="lunch_minutes">30</span> mín)</label>
+          </div>
+          <div id="paidPreview" class="preview">Sæki opna skráningu...</div>
+          <button class="red" onclick="clockOut()">Vista og fara heim</button>
+        </div>
       </div>
     </section>
 
@@ -96,7 +110,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;bor
           <div class="row">
             <div style="flex:1"><label>Kennitala</label><input id="newNationalId" placeholder="000000-0000"></div>
             <div style="flex:1"><label>Starfsnúmer</label><input id="newEmployeeNo" placeholder="t.d. 001"></div>
-            <div style="flex:1"><label>Tímakaup</label><input id="newHourlyRate" type="number" placeholder="kr á klst"></div>
+            <div style="flex:1"><label>Tímakaup</label><input id="newHourlyRate" type="number" placeholder="kr á klst"></div><div style="flex:1"><label>PIN</label><input id="newPin" inputmode="numeric" maxlength="4" placeholder="1234"></div>
           </div>
           <button style="margin-top:12px" onclick="addEmployee()">Bæta við</button>
           <h3>Starfsmenn</h3><div id="employeesList"></div>
@@ -144,6 +158,7 @@ const SUPABASE_KEY = "sb_publishable_jRtzeX7p1fweD9NMAPaRzQ_p0LCFYq5";
 const ADMIN_PASSWORD = "Brynjak";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let loggedEmployee = null;
 let employees = [], entries = [], openEntries = [], settings = {
   first_coffee_minutes: 15, second_coffee_minutes: 15, lunch_minutes: 30, overtime_after_hours_day: 8
 };
@@ -157,6 +172,31 @@ function skippedBreakMinutes(fc,sc,lu){
   return (!fc?Number(settings.first_coffee_minutes||0):0)+(!sc?Number(settings.second_coffee_minutes||0):0)+(!lu?Number(settings.lunch_minutes||0):0);
 }
 function paidMinutes(base,fc,sc,lu){ return Math.max(0, Number(base||0) + skippedBreakMinutes(fc,sc,lu)); }
+function employeeLogin(){
+  const id = $("employeeSelect").value;
+  const pin = $("employeePin").value.trim();
+  const emp = employees.find(e=>e.id===id);
+  if(!emp) return toast("Veldu starfsmann");
+  if(!emp.pin_code) return toast("PIN vantar hjá þessum starfsmanni");
+  if(String(emp.pin_code) !== String(pin)) return toast("Rangt PIN");
+  loggedEmployee = emp;
+  $("loggedEmployeeName").textContent = emp.name;
+  $("employeeLoginBox").classList.add("hidden");
+  $("employeeWorkBox").classList.remove("hidden");
+  $("employeePin").value = "";
+  toast("Innskráning tókst");
+}
+function employeeLogout(){
+  loggedEmployee = null;
+  $("employeeWorkBox").classList.add("hidden");
+  $("clockOutBox").classList.add("hidden");
+  $("employeeLoginBox").classList.remove("hidden");
+}
+function requireLoggedEmployee(){
+  if(!loggedEmployee){ toast("Þú þarft að skrá þig inn með PIN"); return null; }
+  return loggedEmployee;
+}
+
 
 async function loadAll(){ await loadSettings(); await loadEmployees(); await loadEntries(); await loadStatus(); }
 async function loadSettings(){
@@ -228,16 +268,16 @@ function renderSummary(){
   $("summary").innerHTML = `<div class="tablewrap"><table><thead><tr><th>Starfsmaður</th><th>Dagar</th><th>Rauntími</th><th>Greiddur tími</th><th>Sleppt hlé</th><th>Yfirvinna</th><th>Áætluð laun</th><th>Sleppt F/S/M</th><th>Fjarvistir</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 async function clockIn(){
-  const id=$("employeeSelect").value; const emp=employees.find(e=>e.id===id); if(!emp) return;
+  const emp=requireLoggedEmployee(); if(!emp) return; const id=emp.id;
   const {data:open} = await sb.from("time_entries").select("*").eq("employee_id",id).is("clock_out",null).limit(1);
   if(open?.length){ toast("Þessi starfsmaður er nú þegar mættur"); return; }
   const {error}= await sb.from("time_entries").insert({employee_id:id, employee_name:emp.name, clock_in:new Date().toISOString(), note:""});
   if(error){ console.error(error); toast("Villa við mætingu"); return; }
-  toast("✅ Mæting skráð"); await loadEntries(); await loadStatus();
+  toast("✅ Mæting skráð"); await loadEntries(); await loadStatus(); setTimeout(employeeLogout, 900);
 }
 function showClockOut(){ $("clockOutBox").classList.toggle("hidden"); previewPaid(); }
 async function previewPaid(){
-  const id=$("employeeSelect").value;
+  const emp=requireLoggedEmployee(); if(!emp) return; const id=emp.id;
   const {data} = await sb.from("time_entries").select("*").eq("employee_id",id).is("clock_out",null).order("clock_in",{ascending:false}).limit(1);
   if(!data?.length){ $("paidPreview").textContent="Engin opin mæting fannst."; return; }
   const entry=data[0], now=new Date();
@@ -247,7 +287,7 @@ async function previewPaid(){
   $("paidPreview").innerHTML = `Rauntími: <b>${minsText(base)}</b><br>Sleppt hlé bætist við: <b>+${minsText(skipped)}</b><br>Greiddur tími í dag: <b>${minsText(paid)}</b>`;
 }
 async function clockOut(){
-  const id=$("employeeSelect").value; const emp=employees.find(e=>e.id===id); if(!emp) return;
+  const emp=requireLoggedEmployee(); if(!emp) return; const id=emp.id;
   const {data,error} = await sb.from("time_entries").select("*").eq("employee_id",id).is("clock_out",null).order("clock_in",{ascending:false}).limit(1);
   if(error || !data?.length){ toast("Engin opin mæting fannst"); return; }
   const entry=data[0], out=new Date();
@@ -257,7 +297,7 @@ async function clockOut(){
   const {error:upErr}=await sb.from("time_entries").update({clock_out:out.toISOString(), total_minutes:base, paid_minutes:paid, first_coffee:fc, second_coffee:sc, lunch:lu, break_minutes:0, skipped_break_minutes:skipped}).eq("id",entry.id);
   if(upErr){ console.error(upErr); toast("Villa við heimferð"); return; }
   $("firstCoffee").checked=$("secondCoffee").checked=$("lunch").checked=true; $("clockOutBox").classList.add("hidden");
-  toast("✅ Heimferð skráð"); await loadEntries(); await loadStatus();
+  toast("✅ Heimferð skráð"); await loadEntries(); await loadStatus(); setTimeout(employeeLogout, 900);
 }
 function toggleAdmin(){ $("admin").classList.toggle("hidden"); }
 function adminLogin(){ if($("adminPass").value===ADMIN_PASSWORD){$("loginBox").classList.add("hidden");$("adminPanel").classList.remove("hidden"); toast("Stjórnandi skráður inn");} else toast("Rangt lykilorð");}
@@ -268,9 +308,10 @@ async function addEmployee(){
   const national_id=$("newNationalId").value.trim();
   const employee_no=$("newEmployeeNo").value.trim();
   const hourly_rate=Number($("newHourlyRate").value||0);
-  const {error}=await sb.from("employees").insert({name,active:true,national_id,employee_no,hourly_rate});
+  const pin_code=$("newPin").value.trim();
+  const {error}=await sb.from("employees").insert({name,active:true,national_id,employee_no,hourly_rate,pin_code});
   if(error){toast("Villa");console.error(error);return;}
-  $("newEmployee").value=""; $("newNationalId").value=""; $("newEmployeeNo").value=""; $("newHourlyRate").value="";
+  $("newEmployee").value=""; $("newNationalId").value=""; $("newEmployeeNo").value=""; $("newHourlyRate").value=""; $("newPin").value="";
   toast("Starfsmaður bættur við"); await loadEmployees();
 }
 async function editEmployee(id){
@@ -279,7 +320,8 @@ async function editEmployee(id){
   const national_id=prompt("Kennitala:", emp.national_id||"") ?? emp.national_id;
   const employee_no=prompt("Starfsnúmer:", emp.employee_no||"") ?? emp.employee_no;
   const hourly_rate=Number(prompt("Tímakaup:", emp.hourly_rate||0) ?? emp.hourly_rate ?? 0);
-  const {error}=await sb.from("employees").update({name,national_id,employee_no,hourly_rate}).eq("id",id);
+  const pin_code=prompt("PIN:", emp.pin_code||"") ?? emp.pin_code;
+  const {error}=await sb.from("employees").update({name,national_id,employee_no,hourly_rate,pin_code}).eq("id",id);
   if(error){toast("Villa við breytingu"); console.error(error); return;}
   toast("Starfsmanni breytt"); await loadEmployees(); await loadEntries();
 }
