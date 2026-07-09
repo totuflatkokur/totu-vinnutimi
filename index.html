@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="is">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Tótu Vinnutími</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0091ff" />
+  <link rel="icon" href="icon-192.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--bg:#050a14;--card:#0d1628;--card2:#101d34;--line:#223250;--txt:#f5f8ff;--muted:#aebbd0;--blue:#0091ff;--green:#16c784;--red:#ff4d4d;--yellow:#ffc857}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:radial-gradient(circle at top,#10213c 0,#050a14 45%);color:var(--txt)}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}.top{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;gap:12px;align-items:center}.logo{width:58px;height:58px;border-radius:18px}.title h1{font-size:26px;margin:0}.title p{margin:2px 0 0;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px}@media(min-width:880px){.grid{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}}
+    .card{background:rgba(13,22,40,.88);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 20px 80px #0005}
+    h2{margin:0 0 14px;font-size:22px} h3{margin:18px 0 10px}.muted{color:var(--muted)}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.between{justify-content:space-between}
+    select,input,textarea{width:100%;padding:15px;border-radius:16px;border:1px solid var(--line);background:#081120;color:var(--txt);font-size:16px}label{display:block;margin:10px 0 6px;color:var(--muted)}
+    button{border:0;border-radius:18px;padding:15px 18px;font-weight:800;font-size:16px;color:white;background:var(--blue);cursor:pointer}button.secondary{background:#17243b}button.green{background:var(--green)}button.red{background:var(--red)}button.yellow{background:#bb8500}.big{font-size:22px;padding:22px;min-width:150px}.hidden{display:none!important}
+    .pill{padding:7px 10px;border-radius:999px;background:#13233d;color:var(--muted);display:inline-flex;gap:6px;align-items:center}.pill.ok{color:#b8ffdb;background:#123827}.pill.bad{color:#ffd0d0;background:#3a1518}
+    table{width:100%;border-collapse:collapse;overflow:auto}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}th{color:#cdd8ea}.tablewrap{overflow:auto}
+    .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#092615;border:1px solid #1bd783;color:#dfffea;padding:16px 18px;border-radius:18px;box-shadow:0 12px 50px #0008;z-index:20;font-weight:800}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tab{background:#13233d}.tab.active{background:var(--blue)}
+    .small{font-size:13px}.danger{color:#ffb3b3}.checkrow{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0}.check{display:flex;gap:10px;align-items:center;background:#081120;border:1px solid var(--line);border-radius:16px;padding:12px}.check input{width:auto}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><img class="logo" src="icon-192.png"><div class="title"><h1>Tótu Vinnutími</h1><p>Velja nafn → MÆTA → FARA HEIM</p></div></div>
+    <button class="secondary" onclick="toggleAdmin()">Stjórnandi</button>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Starfsmaður</h2>
+      <label>Veldu nafn</label>
+      <select id="employeeSelect"></select>
+      <div class="row" style="margin-top:14px">
+        <button class="green big" onclick="clockIn()">🟢 MÆTA</button>
+        <button class="red big" onclick="showClockOut()">🔴 FARA HEIM</button>
+      </div>
+      <div id="clockOutBox" class="hidden" style="margin-top:16px">
+        <h3>Hlé í dag</h3>
+        <p class="muted">Hakaðu við það sem var tekið. Þetta dregst frá vinnutímanum.</p>
+        <div class="checkrow">
+          <label class="check"><input id="firstCoffee" type="checkbox"> Fyrra kaffi (<span data-setting="first_coffee_minutes">15</span> mín)</label>
+          <label class="check"><input id="secondCoffee" type="checkbox"> Seinna kaffi (<span data-setting="second_coffee_minutes">15</span> mín)</label>
+          <label class="check"><input id="lunch" type="checkbox"> Hádegismatur (<span data-setting="lunch_minutes">30</span> mín)</label>
+        </div>
+        <button class="red" onclick="clockOut()">Vista og fara heim</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Staða núna</h2>
+      <div id="currentStatus" class="muted">Sæki stöðu...</div>
+    </section>
+
+    <section id="admin" class="card wide hidden">
+      <div id="loginBox">
+        <h2>Stjórnandi</h2>
+        <label>Lykilorð</label>
+        <input id="adminPass" type="password" placeholder="Lykilorð">
+        <button style="margin-top:10px" onclick="adminLogin()">Innskrá</button>
+      </div>
+      <div id="adminPanel" class="hidden">
+        <div class="row between"><h2>Stjórnborð</h2><button class="secondary" onclick="adminLogout()">Útskrá</button></div>
+        <div class="tabs">
+          <button class="tab active" onclick="tab('overview',this)">Yfirlit</button>
+          <button class="tab" onclick="tab('employees',this)">Starfsmenn</button>
+          <button class="tab" onclick="tab('manual',this)">Handvirkt</button>
+          <button class="tab" onclick="tab('settings',this)">Stillingar</button>
+          <button class="tab" onclick="tab('backup',this)">Backup</button>
+        </div>
+
+        <div id="tab-overview">
+          <div class="row">
+            <input id="monthPicker" type="month" style="max-width:220px" onchange="loadEntries()">
+            <button onclick="downloadCSV()">Sækja Excel/CSV</button>
+            <button class="secondary" onclick="copyPayroll()">Afrita launalista</button>
+          </div>
+          <h3>Mánaðaryfirlit</h3>
+          <div id="summary"></div>
+          <h3>Allar skráningar</h3>
+          <div class="tablewrap"><table><thead><tr><th>Starfsmaður</th><th>Mætti</th><th>Fór</th><th>Hlé</th><th>Tími</th><th>Ath.</th><th></th></tr></thead><tbody id="entriesBody"></tbody></table></div>
+        </div>
+
+        <div id="tab-employees" class="hidden">
+          <h3>Bæta við starfsmanni</h3>
+          <div class="row"><input id="newEmployee" placeholder="Nafn starfsmanns"><button onclick="addEmployee()">Bæta við</button></div>
+          <h3>Starfsmenn</h3><div id="employeesList"></div>
+        </div>
+
+        <div id="tab-manual" class="hidden">
+          <h3>Bæta handvirkt við vinnudegi / fjarvist</h3>
+          <label>Starfsmaður</label><select id="manualEmployee"></select>
+          <label>Tegund</label><select id="manualType"><option value="">Vinnudagur</option><option>Orlof</option><option>Veikindi</option><option>Leyfi</option><option>Frídagur</option></select>
+          <label>Dagsetning</label><input id="manualDate" type="date">
+          <div class="row"><div style="flex:1"><label>Mætti</label><input id="manualIn" type="time" value="08:00"></div><div style="flex:1"><label>Fór heim</label><input id="manualOut" type="time" value="16:00"></div></div>
+          <label>Athugasemd</label><input id="manualNote" placeholder="t.d. gleymdi að stimpla">
+          <button style="margin-top:12px" onclick="addManual()">Vista handvirkt</button>
+        </div>
+
+        <div id="tab-settings" class="hidden">
+          <h3>Hlé og reglur</h3>
+          <label>Fyrra kaffi mínútur</label><input id="setFirst" type="number">
+          <label>Seinna kaffi mínútur</label><input id="setSecond" type="number">
+          <label>Hádegismatur mínútur</label><input id="setLunch" type="number">
+          <label>Yfirvinna eftir klst á dag</label><input id="setOvertime" type="number" step="0.5">
+          <button style="margin-top:12px" onclick="saveSettings()">Vista stillingar</button>
+        </div>
+
+        <div id="tab-backup" class="hidden">
+          <h3>Afrit</h3>
+          <button onclick="backup()">Sækja backup JSON</button>
+          <p class="muted small">Backup inniheldur starfsmenn, tímaskráningar og stillingar.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const SUPABASE_URL = "https://rzvcprkdriiywupaqupv.supabase.co";
+const SUPABASE_KEY = "sb_publishable_jRtzeX7p1fweD9NMAPaRzQ_p0LCFYq5";
+const ADMIN_PASSWORD = "Brynjak";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let employees = [], entries = [], settings = {
+  first_coffee_minutes: 15, second_coffee_minutes: 15, lunch_minutes: 30, overtime_after_hours_day: 8
+};
+
+const $ = id => document.getElementById(id);
+function toast(msg){ $("toast").textContent=msg; $("toast").classList.remove("hidden"); setTimeout(()=>$("toast").classList.add("hidden"),2200); }
+function fmtDate(v){ if(!v) return ""; return new Date(v).toLocaleString("is-IS",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
+function minsText(m){ m=Number(m||0); return `${Math.floor(m/60)} klst ${String(m%60).padStart(2,"0")} mín`; }
+function localISO(date, time){ return new Date(`${date}T${time}:00`).toISOString(); }
+
+async function loadAll(){
+  await loadSettings();
+  await loadEmployees();
+  await loadEntries();
+  await loadStatus();
+}
+async function loadSettings(){
+  const {data} = await sb.from("app_settings").select("*");
+  if(data) data.forEach(x => settings[x.key] = Number(x.value));
+  $("setFirst").value=settings.first_coffee_minutes; $("setSecond").value=settings.second_coffee_minutes; $("setLunch").value=settings.lunch_minutes; $("setOvertime").value=settings.overtime_after_hours_day;
+  document.querySelectorAll("[data-setting]").forEach(el=>el.textContent=settings[el.dataset.setting]);
+}
+async function loadEmployees(){
+  const {data,error} = await sb.from("employees").select("*").order("name");
+  if(error){ toast("Villa við að sækja starfsmenn"); console.error(error); return; }
+  employees=(data||[]).filter(e=>e.active!==false);
+  const opts = employees.map(e=>`<option value="${e.id}">${e.name}</option>`).join("");
+  $("employeeSelect").innerHTML=opts; $("manualEmployee").innerHTML=opts;
+  $("employeesList").innerHTML = employees.map(e=>`<div class="row between" style="padding:10px;border-bottom:1px solid var(--line)"><b>${e.name}</b><div class="row"><button class="secondary" onclick="renameEmployee('${e.id}','${e.name.replaceAll("'","\\'")}')">Breyta</button><button class="red" onclick="deleteEmployee('${e.id}')">Eyða</button></div></div>`).join("");
+}
+async function loadEntries(){
+  const month = $("monthPicker").value || new Date().toISOString().slice(0,7);
+  $("monthPicker").value = month;
+  const start = new Date(month+"-01T00:00:00");
+  const end = new Date(start); end.setMonth(end.getMonth()+1);
+  const {data,error} = await sb.from("time_entries").select("*").gte("clock_in",start.toISOString()).lt("clock_in",end.toISOString()).order("clock_in",{ascending:false});
+  if(error){ toast("Villa við að sækja skráningar"); console.error(error); return; }
+  entries=data||[];
+  renderEntries(); renderSummary();
+}
+async function loadStatus(){
+  const {data} = await sb.from("time_entries").select("*").is("clock_out", null).not("clock_in","is",null).order("clock_in",{ascending:false});
+  const active = (data||[]);
+  $("currentStatus").innerHTML = active.length ? active.map(e=>`<div class="pill ok" style="margin:5px">🟢 ${e.employee_name} mætti ${fmtDate(e.clock_in)}</div>`).join("") : `<span class="pill">Enginn skráður inni núna</span>`;
+}
+function renderEntries(){
+  $("entriesBody").innerHTML = entries.map(e=>{
+    const breaks = [e.first_coffee?"Fyrra kaffi":"", e.second_coffee?"Seinna kaffi":"", e.lunch?"Matur":"", e.absence_type||""].filter(Boolean).join(", ");
+    return `<tr><td>${e.employee_name||""}</td><td>${fmtDate(e.clock_in)}</td><td>${fmtDate(e.clock_out)}</td><td>${breaks||"-"}<br><span class="muted small">${e.break_minutes||0} mín</span></td><td>${minsText(e.total_minutes)}</td><td>${e.note||""}</td><td><button class="red" onclick="deleteEntry('${e.id}')">Eyða</button></td></tr>`;
+  }).join("");
+}
+function renderSummary(){
+  const map = {};
+  entries.forEach(e=>{
+    const n=e.employee_name||"Óþekkt"; if(!map[n]) map[n]={mins:0, days:new Set(), breaks:0, overtime:0, abs:0};
+    const mins=Number(e.total_minutes||0); map[n].mins += mins; map[n].breaks += Number(e.break_minutes||0);
+    if(e.clock_in) map[n].days.add(new Date(e.clock_in).toISOString().slice(0,10));
+    if(e.absence_type) map[n].abs += 1;
+    const otAfter = Number(settings.overtime_after_hours_day||8)*60;
+    if(mins>otAfter) map[n].overtime += (mins-otAfter);
+  });
+  const rows = Object.entries(map).sort().map(([n,s])=>`<tr><td>${n}</td><td>${s.days.size}</td><td>${minsText(s.mins)}</td><td>${minsText(s.overtime)}</td><td>${minsText(s.breaks)}</td><td>${s.abs}</td></tr>`).join("");
+  $("summary").innerHTML = `<div class="tablewrap"><table><thead><tr><th>Starfsmaður</th><th>Dagar</th><th>Unnið</th><th>Yfirvinna</th><th>Hlé</th><th>Fjarvistir</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+async function clockIn(){
+  const id=$("employeeSelect").value; const emp=employees.find(e=>e.id===id); if(!emp) return;
+  const {data:open} = await sb.from("time_entries").select("*").eq("employee_id",id).is("clock_out",null).limit(1);
+  if(open?.length){ toast("Þessi starfsmaður er nú þegar mættur"); return; }
+  const {error}= await sb.from("time_entries").insert({employee_id:id, employee_name:emp.name, clock_in:new Date().toISOString(), note:""});
+  if(error){ console.error(error); toast("Villa við mætingu"); return; }
+  toast("✅ Mæting skráð"); await loadEntries(); await loadStatus();
+}
+function showClockOut(){ $("clockOutBox").classList.toggle("hidden"); }
+async function clockOut(){
+  const id=$("employeeSelect").value; const emp=employees.find(e=>e.id===id); if(!emp) return;
+  const {data,error} = await sb.from("time_entries").select("*").eq("employee_id",id).is("clock_out",null).order("clock_in",{ascending:false}).limit(1);
+  if(error || !data?.length){ toast("Engin opin mæting fannst"); return; }
+  const entry=data[0], out=new Date();
+  const fc=$("firstCoffee").checked, sc=$("secondCoffee").checked, lu=$("lunch").checked;
+  const breakM=(fc?settings.first_coffee_minutes:0)+(sc?settings.second_coffee_minutes:0)+(lu?settings.lunch_minutes:0);
+  const total=Math.max(0, Math.round((out-new Date(entry.clock_in))/60000)-breakM);
+  const {error:upErr}=await sb.from("time_entries").update({clock_out:out.toISOString(), total_minutes:total, first_coffee:fc, second_coffee:sc, lunch:lu, break_minutes:breakM}).eq("id",entry.id);
+  if(upErr){ console.error(upErr); toast("Villa við heimferð"); return; }
+  $("firstCoffee").checked=$("secondCoffee").checked=$("lunch").checked=false; $("clockOutBox").classList.add("hidden");
+  toast("✅ Heimferð skráð"); await loadEntries(); await loadStatus();
+}
+function toggleAdmin(){ $("admin").classList.toggle("hidden"); }
+function adminLogin(){ if($("adminPass").value===ADMIN_PASSWORD){$("loginBox").classList.add("hidden");$("adminPanel").classList.remove("hidden"); toast("Stjórnandi skráður inn");} else toast("Rangt lykilorð");}
+function adminLogout(){ $("loginBox").classList.remove("hidden");$("adminPanel").classList.add("hidden");}
+function tab(name,btn){ ["overview","employees","manual","settings","backup"].forEach(x=>$("tab-"+x).classList.toggle("hidden",x!==name)); document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); }
+async function addEmployee(){ const name=$("newEmployee").value.trim(); if(!name) return; const {error}=await sb.from("employees").insert({name,active:true}); if(error){toast("Villa");console.error(error);return;} $("newEmployee").value=""; toast("Starfsmaður bættur við"); await loadEmployees();}
+async function renameEmployee(id,old){ const name=prompt("Nýtt nafn:",old); if(!name) return; await sb.from("employees").update({name}).eq("id",id); toast("Nafni breytt"); await loadEmployees(); await loadEntries();}
+async function deleteEmployee(id){ if(!confirm("Eyða starfsmanni af lista? Gamlar skráningar geymast.")) return; await sb.from("employees").update({active:false}).eq("id",id); toast("Starfsmaður falinn"); await loadEmployees();}
+async function addManual(){
+  const id=$("manualEmployee").value, emp=employees.find(e=>e.id===id), date=$("manualDate").value, tin=$("manualIn").value, tout=$("manualOut").value;
+  if(!emp||!date) return toast("Vantar starfsmann eða dagsetningu");
+  const type=$("manualType").value;
+  let ci=localISO(date,tin), co=localISO(date,tout), total=Math.max(0,Math.round((new Date(co)-new Date(ci))/60000));
+  if(type){ total=0; }
+  const {error}=await sb.from("time_entries").insert({employee_id:id, employee_name:emp.name, clock_in:ci, clock_out:co, total_minutes:total, note:$("manualNote").value||"Handvirk skráning", manual:true, absence_type:type||null});
+  if(error){console.error(error);toast("Villa við handvirka skráningu");return;}
+  toast("Handvirk skráning vistuð"); await loadEntries();
+}
+async function deleteEntry(id){ if(!confirm("Eyða þessari skráningu?")) return; await sb.from("time_entries").delete().eq("id",id); toast("Skráningu eytt"); await loadEntries(); await loadStatus();}
+async function saveSettings(){
+  const vals={first_coffee_minutes:$("setFirst").value||15, second_coffee_minutes:$("setSecond").value||15, lunch_minutes:$("setLunch").value||30, overtime_after_hours_day:$("setOvertime").value||8};
+  for(const [key,value] of Object.entries(vals)){ await sb.from("app_settings").upsert({key,value:String(value),updated_at:new Date().toISOString()}); }
+  toast("Stillingar vistaðar"); await loadSettings(); await loadEntries();
+}
+function csvEscape(v){ return `"${String(v??"").replaceAll('"','""')}"`; }
+function downloadCSV(){
+  const header=["Starfsmaður","Mætti","Fór","Unnar mín","Unnið","Hlé mín","Athugasemd","Fjarvist"];
+  const rows=entries.map(e=>[e.employee_name,fmtDate(e.clock_in),fmtDate(e.clock_out),e.total_minutes,minsText(e.total_minutes),e.break_minutes,e.note,e.absence_type].map(csvEscape).join(";"));
+  const blob=new Blob(["\ufeff"+header.join(";")+"\n"+rows.join("\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="totu-vinnutimi.csv"; a.click();
+}
+function copyPayroll(){
+  const lines=[...document.querySelectorAll("#summary tbody tr")].map(tr=>{const t=[...tr.children].map(td=>td.textContent); return `${t[0]} – ${t[2]} (yfirvinna ${t[3]})`;});
+  navigator.clipboard.writeText(lines.join("\n")); toast("Launalisti afritaður");
+}
+async function backup(){
+  const [e,t,s]=await Promise.all([sb.from("employees").select("*"),sb.from("time_entries").select("*"),sb.from("app_settings").select("*")]);
+  const blob=new Blob([JSON.stringify({employees:e.data,time_entries:t.data,settings:s.data,exported_at:new Date().toISOString()},null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="totu-vinnutimi-backup.json"; a.click();
+}
+$("monthPicker").value = new Date().toISOString().slice(0,7);
+loadAll();
+</script>
+</body>
+</html>
