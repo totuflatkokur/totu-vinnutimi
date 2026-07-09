@@ -1,15 +1,24 @@
-# TótuOS Enterprise v7.0 Admin Pack
+# TótuOS Enterprise v4.0
 
-Þessi pakki er hugsaður eins og uppfærslupakkarnir sem við höfum verið að gera.
+Þetta er hreinn pakki fyrir Netlify/GitHub verkefnið.
 
-## Innihald
-- `supabase_v7_admin.sql` — SQL fyrir yfirlit, audit log og view
-- `AdminDashboard.tsx` — Stjórnandi síða með mánaðaryfirliti, live status og CSV export
-- `supabaseClient.ts` — dæmi um Supabase client ef vantar
-- `install_notes.md` — stuttar leiðbeiningar
+## Skrár
+- index.html
+- style.css
+- app.js
+- supabase.js
+- supabase_v4.sql
 
-## Setja inn
-1. Keyrðu `supabase_v7_admin.sql` í Supabase SQL Editor.
-2. Settu `AdminDashboard.tsx` inn í `src/pages` eða þar sem admin síðan þín er.
-3. Tengdu route/takka í appinu við AdminDashboard.
-4. Ef Supabase client er nú þegar til, notaðu þinn núverandi client.
+## Mikilvægt
+Ef gamla `supabase.js` hjá þér virkar, haltu henni frekar.
+Ef þú notar þessa nýju `supabase.js`, settu inn rétt:
+- SUPABASE_URL
+- SUPABASE_ANON_KEY
+- ADMIN_PASSWORD
+
+## Uppsetning
+1. Keyrðu `supabase_v4.sql` í Supabase SQL Editor.
+2. Settu `index.html`, `style.css` og `app.js` yfir gömlu skrárnar í GitHub.
+3. Ekki eyða gamla `supabase.js` nema þú ætlir að setja Supabase URL og key inn aftur.
+4. Commit changes.
+5. Netlify deploy-ar sjálfkrafa.
