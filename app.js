@@ -75,5 +75,93 @@ async function addInventory(){const name=$("inventoryName").value.trim();if(!nam
 async function adjustInventory(id,amount){const item=inventory.find(i=>i.id===id);if(!item)return;await db.from("inventory_items").update({quantity:Number(item.quantity||0)+amount}).eq("id",id);await loadInventory();renderAll()}
 
 async function backup(){const all=await Promise.all([db.from("employees").select("*"),db.from("time_entries").select("*"),db.from("customers").select("*"),db.from("orders").select("*"),db.from("production_days").select("*"),db.from("tasks").select("*"),db.from("inventory_items").select("*")]);const data={employees:all[0].data,time_entries:all[1].data,customers:all[2].data,orders:all[3].data,production_days:all[4].data,tasks:all[5].data,inventory_items:all[6].data,exported_at:new Date().toISOString()};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="totuos-backup.json";a.click()}
-function payrollCSV(){const header=["Starfsmaður","Greiddar mínútur"];const rows=entries.map(e=>[e.employee_name,e.paid_minutes??e.total_minutes].map(csvEscape).join(";"));const blob=new Blob(["\ufeff"+header.join(";")+"\n"+rows.join("\n")],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="totuos-laun.csv";a.click()}
+
+let monthlyHours = [];
+
+async function loadMonthlyHours(){
+  const { data, error } = await db
+    .from("monthly_employee_hours")
+    .select("*")
+    .order("employee_name");
+
+  if(error){
+    console.error(error);
+    toast("Villa við að sækja mánaðaryfirlit");
+    monthlyHours = [];
+    return;
+  }
+
+  monthlyHours = data || [];
+}
+
+function renderAdminMonthly(){
+  const panel = $("adminPanel");
+  if(!panel) return;
+
+  if(!$("monthlyHoursBox")){
+    panel.insertAdjacentHTML("beforeend", `
+      <div id="monthlyHoursBox" class="card" style="margin-top:20px">
+        <h2>📊 Mánaðaryfirlit starfsmanna</h2>
+
+        <div class="row">
+          <select id="monthSelect"></select>
+          <select id="yearSelect"></select>
+        </div>
+
+        <div id="monthlyHoursList"></div>
+      </div>
+    `);
+
+    const m = $("monthSelect");
+    const y = $("yearSelect");
+    const now = new Date();
+
+    m.innerHTML = Array.from({length:12},(_,i)=>`
+      <option value="${i+1}" ${i===now.getMonth()?"selected":""}>${i+1}</option>
+    `).join("");
+
+    y.innerHTML = [now.getFullYear()-1, now.getFullYear(), now.getFullYear()+1]
+      .map(year=>`<option value="${year}" ${year===now.getFullYear()?"selected":""}>${year}</option>`)
+      .join("");
+
+    m.onchange = renderAdminMonthlyList;
+    y.onchange = renderAdminMonthlyList;
+  }
+
+  renderAdminMonthlyList();
+}
+
+function renderAdminMonthlyList(){
+  const box = $("monthlyHoursList");
+  if(!box) return;
+
+  const month = Number($("monthSelect").value);
+  const year = Number($("yearSelect").value);
+
+  const filtered = monthlyHours.filter(r=>{
+    if(!r.month) return false;
+    const d = new Date(r.month);
+    return d.getMonth()+1 === month && d.getFullYear() === year;
+  });
+
+  if(!filtered.length){
+    box.innerHTML = `<p class="pill">Engar tímaskráningar fundust fyrir valinn mánuð.</p>`;
+    return;
+  }
+
+  box.innerHTML = filtered.map(r=>`
+    <div class="item">
+      <div>
+        <b>${r.employee_name || "Óþekktur starfsmaður"}</b><br>
+        <span class="muted small">
+          ${r.shift_count || 0} vaktir · síðast: ${r.last_shift ? fmt(r.last_shift) : "-"}
+        </span>
+      </div>
+      <div>
+        <span class="pill ok">${Number(r.total_hours || 0).toFixed(2)} klst</span>
+        ${r.is_working_now ? `<span class="pill bad">Í vinnu núna</span>` : `<span class="pill">Ekki í vinnu</span>`}
+      </div>
+    </div>
+  `).join("");
+}function payrollCSV(){const header=["Starfsmaður","Greiddar mínútur"];const rows=entries.map(e=>[e.employee_name,e.paid_minutes??e.total_minutes].map(csvEscape).join(";"));const blob=new Blob(["\ufeff"+header.join(";")+"\n"+rows.join("\n")],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="totuos-laun.csv";a.click()}
 init();
