@@ -1,22 +1,9 @@
-# TótuOS Enterprise v5
+# Tótu Vinnutími PRO v1.3
 
-Hreinn pakki. Notaðu aðeins þessar skrár:
-- index.html
-- style.css
-- app.js
-- supabase.js
-- manifest.json
-- icon-192.png / icon-512.png ef þú átt þær
+Nýtt:
+- PIN innskráning starfsmanna
+- Starfsmenn þurfa PIN til að mæta/fara heim
+- Sjálfgefið PIN verður 1234 fyrir eldri starfsmenn
+- Stjórnandi getur breytt PIN hjá hverjum starfsmanni
 
-Ekki nota:
-- AdminDashboard.tsx
-- supabaseClient.ts
-- v7 skrár
-- Word skjöl
-
-## Uppsetning
-1. Settu publishable key í `supabase.js`.
-2. Keyrðu `supabase_v5.sql` í Supabase SQL Editor.
-3. Settu `index.html`, `style.css`, `app.js`, `supabase.js` yfir í GitHub.
-4. Commit changes.
-5. Netlify deployar sjálfkrafa.
+Stjórnandalykilorð: `Brynjak`
