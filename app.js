@@ -36,9 +36,16 @@ async function loadCustomers(){const{data}=await db.from("customers").select("*"
 async function loadOrders(){const d=$("orderDate").value||today();const{data}=await db.from("orders").select("*, customers(*)").eq("order_date",d).order("created_at");orders=data||[]}
 async function loadProduction(){const d=$("productionDate").value||today();const{data}=await db.from("production_days").select("*").eq("work_date",d).limit(1);production=data||[]}
 async function loadTasks(){const d=$("taskDate").value||today();const{data}=await db.from("tasks").select("*, employees(*)").eq("task_date",d).order("created_at");tasks=data||[]}
-async function loadInventory(){const{data}=await db.from("inventory_items").select("*").order("name");inventory=data||[]}
-
-function renderAll(){renderHome();renderTime();renderCustomers();renderOrders();renderProduction();renderTasks();renderInventory()}
+function renderAll(){
+  renderHome();
+  renderTime();
+  renderCustomers();
+  renderOrders();
+  renderProduction();
+  renderTasks();
+  renderInventory();
+  loadMonthlyHours().then(renderAdminMonthly);
+}
 function renderHome(){
  const open=entries.filter(e=>!e.clock_out); const paid=entries.reduce((a,e)=>a+Number(e.paid_minutes??e.total_minutes??0),0); const orderPacks=orders.reduce((a,o)=>a+Number(o.packs||0),0); const prod=production[0]||{}; const undone=tasks.filter(t=>!t.completed_at).length; const low=inventory.filter(i=>Number(i.quantity||0)<=Number(i.min_quantity||0)).length;
  $("homeStats").innerHTML=`<div class="stat"><span>Í vinnu</span><b>${open.length}</b></div><div class="stat"><span>Pantanir pakkar</span><b>${orderPacks}</b></div><div class="stat"><span>Greitt í dag</span><b>${minsText(paid)}</b></div><div class="stat"><span>Verk eftir</span><b>${undone}</b></div>`;
