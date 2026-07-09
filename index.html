@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Tótu Vinnutími PRO v2.1</title>
+  <title>TótuOS Enterprise v3.0</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" />
   <meta name="theme-color" content="#0091ff" />
@@ -11,172 +11,153 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="wrap">
-    <header class="top">
-      <div class="brand">
-        <img src="icon-192.png" class="logo" alt="">
-        <div>
-          <h1>Tótu Vinnutími PRO</h1>
-          <p>v2.1 · örugg PIN breyting · laun · mánaðaryfirlit</p>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <img src="icon-192.png" class="logo" />
+      <div>
+        <h1>TótuOS Enterprise</h1>
+        <p>v3.0 · vinnutími · pantanir · framleiðsla</p>
+      </div>
+    </div>
+    <button id="adminBtn" class="secondary">Stjórnandi</button>
+  </header>
+
+  <nav class="nav">
+    <button class="navBtn active" data-page="home">🏠 Heim</button>
+    <button class="navBtn" data-page="time">⏰ Vinnutími</button>
+    <button class="navBtn" data-page="orders">📦 Pantanir</button>
+    <button class="navBtn" data-page="production">🍞 Framleiðsla</button>
+    <button class="navBtn" data-page="customers">🏪 Verslanir</button>
+    <button class="navBtn" data-page="admin">👨‍💼 Stjórnandi</button>
+  </nav>
+
+  <main>
+    <section id="page-home" class="page">
+      <div class="grid">
+        <div class="card wide">
+          <h2>🌅 Morgunstjórnborð</h2>
+          <div id="homeStats" class="statgrid"></div>
+        </div>
+        <div class="card">
+          <h2>👷 Í vinnu núna</h2>
+          <div id="openEntries"></div>
+        </div>
+        <div class="card">
+          <h2>📦 Pantanir dagsins</h2>
+          <div id="todayOrders"></div>
+        </div>
+        <div class="card wide">
+          <h2>🍞 Framleiðslustaða</h2>
+          <div id="productionStatus"></div>
         </div>
       </div>
-      <button class="secondary" id="adminToggle">Stjórnandi</button>
-    </header>
+    </section>
 
-    <main class="grid">
-      <section class="card">
-        <h2>Starfsmaður</h2>
-
-        <div id="employeeLogin">
-          <label>Veldu nafn</label>
-          <select id="employeeSelect"></select>
-          <label>PIN</label>
-          <input id="employeePin" type="password" inputmode="numeric" maxlength="12" placeholder="PIN" />
-          <button id="employeeLoginBtn">Innskrá</button>
-          <p class="muted small">Ef PIN hefur verið endurstillt þarf starfsmaður að velja nýtt PIN.</p>
-        </div>
-
-        <div id="employeePanel" class="hidden">
-          <div class="loginStatus">
-            Innskráður: <b id="loggedEmployeeName"></b>
-            <button class="secondary smallBtn" id="employeeLogoutBtn">Útskrá</button>
+    <section id="page-time" class="page hidden">
+      <div class="grid">
+        <div class="card">
+          <h2>Starfsmaður</h2>
+          <div id="employeeLogin">
+            <label>Veldu nafn</label>
+            <select id="employeeSelect"></select>
+            <label>PIN</label>
+            <input id="employeePin" type="password" inputmode="numeric" maxlength="12" placeholder="PIN" />
+            <button id="employeeLoginBtn">Innskrá</button>
           </div>
-
-          <div id="mustChangePinBox" class="warnBox hidden">
-            <h3>Veldu nýtt PIN</h3>
-            <p class="muted">Þú þarft að velja nýtt PIN áður en þú getur stimplað þig.</p>
-            <label>Núverandi PIN</label>
-            <input id="changeOldPin" type="password" inputmode="numeric" maxlength="12">
-            <label>Nýtt PIN</label>
-            <input id="changeNewPin" type="password" inputmode="numeric" maxlength="12">
-            <label>Staðfesta nýtt PIN</label>
-            <input id="changeNewPin2" type="password" inputmode="numeric" maxlength="12">
-            <button id="changePinBtn">Vista nýtt PIN</button>
-          </div>
-
-          <div id="employeeActions">
-            <div class="row actionRow">
-              <button class="green big" id="clockInBtn">🟢 MÆTA</button>
-              <button class="red big" id="clockOutShowBtn">🔴 FARA HEIM</button>
-            </div>
-            <button class="secondary" id="showChangePinBtn">Breyta PIN</button>
-
+          <div id="employeePanel" class="hidden">
+            <div class="loginStatus">Innskráður: <b id="loggedEmployeeName"></b> <button id="employeeLogoutBtn" class="secondary smallBtn">Útskrá</button></div>
+            <button id="clockInBtn" class="green big">🟢 MÆTA</button>
+            <button id="clockOutShowBtn" class="red big">🔴 FARA HEIM</button>
             <div id="clockOutBox" class="hidden">
-              <h3>Var allt rétt í dag?</h3>
-              <p class="muted">Hakaðu við hléin sem þú <b>tókst</b>. Ef þú slepptir hléi bætist sá tími við greiddar klst.</p>
-              <label class="check"><input id="firstCoffee" type="checkbox" checked /> Ég tók fyrra kaffi (<span data-setting="first_coffee_minutes">15</span> mín)</label>
-              <label class="check"><input id="secondCoffee" type="checkbox" checked /> Ég tók seinna kaffi (<span data-setting="second_coffee_minutes">15</span> mín)</label>
-              <label class="check"><input id="lunch" type="checkbox" checked /> Ég tók hádegismat (<span data-setting="lunch_minutes">30</span> mín)</label>
+              <h3>Hlé sem þú tókst</h3>
+              <label class="check"><input id="firstCoffee" type="checkbox" checked /> Fyrra kaffi</label>
+              <label class="check"><input id="secondCoffee" type="checkbox" checked /> Seinna kaffi</label>
+              <label class="check"><input id="lunch" type="checkbox" checked /> Hádegismatur</label>
               <div id="paidPreview" class="preview"></div>
-              <button class="red" id="clockOutBtn">Vista og fara heim</button>
+              <button id="clockOutBtn" class="red">Vista og fara heim</button>
             </div>
-
-            <h3>Mínar skráningar</h3>
-            <div id="myEntries" class="miniList"></div>
           </div>
         </div>
-      </section>
+        <div class="card">
+          <h2>Staða</h2>
+          <div id="timeDashboard" class="statgrid"></div>
+        </div>
+      </div>
+    </section>
 
-      <section class="card">
-        <h2>Mælaborð</h2>
-        <div id="dashboardStats" class="statgrid"></div>
-        <h3>Í vinnu núna</h3>
-        <div id="openEntriesBox" class="miniList"></div>
-      </section>
+    <section id="page-orders" class="page hidden">
+      <div class="card">
+        <h2>📦 Pantanir</h2>
+        <div class="row">
+          <input id="orderDate" type="date">
+          <select id="orderCustomer"></select>
+          <input id="orderPacks" type="number" placeholder="Pakkar">
+          <input id="orderItems" type="number" placeholder="Stykki">
+          <button id="addOrderBtn">Bæta við</button>
+        </div>
+        <div class="row">
+          <button id="copyYesterdayBtn" class="secondary">Afrita gærdaginn</button>
+          <button id="exportOrdersBtn" class="secondary">Sækja pantanir CSV</button>
+        </div>
+        <h3>Pantanir valins dags</h3>
+        <div id="ordersList"></div>
+      </div>
+    </section>
 
-      <section id="adminSection" class="card wide hidden">
+    <section id="page-production" class="page hidden">
+      <div class="grid">
+        <div class="card">
+          <h2>🍞 Framleiðsla dagsins</h2>
+          <label>Dagsetning</label>
+          <input id="productionDate" type="date">
+          <label>Markmið pakkar</label>
+          <input id="productionTarget" type="number" placeholder="t.d. 2264">
+          <button id="saveProductionTargetBtn">Vista markmið</button>
+        </div>
+        <div class="card">
+          <h2>Stórir takkar</h2>
+          <button class="big" id="addDoughBtn">🥣 Deig +1</button>
+          <button class="big green" id="addBakedBtn">🫓 Bakað +100</button>
+          <button class="big green" id="addPackedBtn">📦 Pakkað +50</button>
+          <button class="big secondary" id="loadTruckBtn">🚚 Komið í bíl</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-customers" class="page hidden">
+      <div class="card">
+        <h2>🏪 Verslanir / viðskiptavinir</h2>
+        <div class="row">
+          <input id="customerName" placeholder="Nafn verslunar">
+          <input id="customerChain" placeholder="Keðja t.d. Bónus">
+          <input id="customerRoute" placeholder="Leið">
+          <button id="addCustomerBtn">Bæta við</button>
+        </div>
+        <div id="customersList"></div>
+      </div>
+    </section>
+
+    <section id="page-admin" class="page hidden">
+      <div class="card">
         <div id="adminLogin">
           <h2>Stjórnandi</h2>
           <label>Lykilorð</label>
-          <input id="adminPassword" type="password" placeholder="Lykilorð" />
+          <input id="adminPassword" type="password" placeholder="Lykilorð">
           <button id="adminLoginBtn">Innskrá</button>
         </div>
-
         <div id="adminPanel" class="hidden">
-          <div class="row between">
-            <h2>Stjórnborð</h2>
-            <button class="secondary" id="adminLogoutBtn">Útskrá</button>
-          </div>
-
-          <div class="tabs">
-            <button class="tab active" data-tab="overview">Yfirlit</button>
-            <button class="tab" data-tab="employees">Starfsmenn</button>
-            <button class="tab" data-tab="manual">Handvirkt</button>
-            <button class="tab" data-tab="settings">Stillingar</button>
-            <button class="tab" data-tab="backup">Backup</button>
-          </div>
-
-          <div id="tab-overview" class="tabPage">
-            <div class="row">
-              <input id="monthPicker" type="month" />
-              <button id="exportCsvBtn">Sækja Excel/CSV</button>
-              <button class="secondary" id="copyPayrollBtn">Afrita launalista</button>
-            </div>
-            <h3>Mánaðaryfirlit</h3>
-            <div id="summary"></div>
-            <h3>Allar skráningar</h3>
-            <div class="tablewrap">
-              <table>
-                <thead>
-                  <tr><th>Starfsmaður</th><th>Mætti</th><th>Fór</th><th>Hlé</th><th>Rauntími</th><th>Greiddur tími</th><th>Ath.</th><th></th></tr>
-                </thead>
-                <tbody id="entriesBody"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <div id="tab-employees" class="tabPage hidden">
-            <h3>Bæta við starfsmanni</h3>
-            <label>Nafn</label><input id="newName" placeholder="Nafn starfsmanns" />
-            <div class="row">
-              <div class="grow"><label>Kennitala</label><input id="newNationalId" placeholder="000000-0000" /></div>
-              <div class="grow"><label>Starfsnúmer</label><input id="newEmployeeNo" placeholder="001" /></div>
-              <div class="grow"><label>PIN</label><input id="newPin" inputmode="numeric" maxlength="12" placeholder="1234" /></div>
-              <div class="grow"><label>Tímakaup</label><input id="newHourlyRate" type="number" placeholder="kr/klst" /></div>
-            </div>
-            <button id="addEmployeeBtn">Bæta við</button>
-            <h3>Starfsmenn</h3>
-            <div id="employeesList"></div>
-          </div>
-
-          <div id="tab-manual" class="tabPage hidden">
-            <h3>Bæta handvirkt við vinnudegi / fjarvist</h3>
-            <label>Starfsmaður</label><select id="manualEmployee"></select>
-            <label>Tegund</label>
-            <select id="manualType"><option value="">Vinnudagur</option><option>Orlof</option><option>Veikindi</option><option>Leyfi</option><option>Frídagur</option></select>
-            <label>Dagsetning</label><input id="manualDate" type="date" />
-            <div class="row">
-              <div class="grow"><label>Mætti</label><input id="manualIn" type="time" value="08:00" /></div>
-              <div class="grow"><label>Fór heim</label><input id="manualOut" type="time" value="16:00" /></div>
-            </div>
-            <label class="check"><input id="manualFirstCoffee" type="checkbox" checked /> Tók fyrra kaffi</label>
-            <label class="check"><input id="manualSecondCoffee" type="checkbox" checked /> Tók seinna kaffi</label>
-            <label class="check"><input id="manualLunch" type="checkbox" checked /> Tók hádegismat</label>
-            <label>Athugasemd</label><input id="manualNote" placeholder="t.d. gleymdi að stimpla" />
-            <button id="addManualBtn">Vista handvirkt</button>
-          </div>
-
-          <div id="tab-settings" class="tabPage hidden">
-            <h3>Stillingar</h3>
-            <p class="muted">Regla: Tekin hlé breyta engu. Sleppt hlé bætist við greiddan tíma.</p>
-            <label>Fyrra kaffi mínútur</label><input id="settingFirstCoffee" type="number" />
-            <label>Seinna kaffi mínútur</label><input id="settingSecondCoffee" type="number" />
-            <label>Hádegismatur mínútur</label><input id="settingLunch" type="number" />
-            <label>Yfirvinna eftir klst á dag</label><input id="settingOvertime" type="number" step="0.5" />
-            <button id="saveSettingsBtn">Vista stillingar</button>
-          </div>
-
-          <div id="tab-backup" class="tabPage hidden">
-            <h3>Backup</h3>
-            <button id="backupBtn">Sækja backup JSON</button>
-          </div>
+          <h2>Stjórnborð</h2>
+          <button id="backupBtn">💾 Sækja backup</button>
+          <button id="payrollCsvBtn">💰 Launa CSV</button>
+          <div id="adminSummary"></div>
         </div>
-      </section>
-    </main>
-  </div>
-
-  <div id="toast" class="toast hidden"></div>
-  <script src="supabase.js"></script>
-  <script src="app.js"></script>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast hidden"></div>
+<script src="supabase.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 {
-  "name": "Tótu Vinnutími PRO",
-  "short_name": "Vinnutími",
+  "name": "TótuOS Enterprise",
+  "short_name": "TótuOS",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#050a14",
+  "background_color": "#040812",
   "theme_color": "#0091ff",
   "icons": [
     {

@@ -1,10 +1,14 @@
-# Tótu Vinnutími PRO v2.1
+# TótuOS Enterprise v3.0
 
-Nýtt:
-- Starfsmenn geta breytt PIN sjálfir
-- Stjórnandi getur endurstillt PIN
-- Nýtt PIN vistast sem SHA-256 hash
-- Starfsmenn með tímabundið PIN þurfa að velja nýtt PIN
-- Sjálfgefið tímabundið PIN: 1234
+Fyrsta útgáfa af rekstrarkerfi:
+- Heimaskjár / morgunstjórnborð
+- Vinnutími
+- Pantanir
+- Verslanir
+- Framleiðsla
+- Backup
 
-Stjórnandalykilorð: `Brynjak`
+## Uppsetning
+1. Keyrðu `supabase-setup.sql` í Supabase.
+2. Hladdu skrám inn á GitHub.
+3. Netlify uppfærir sjálfkrafa.
