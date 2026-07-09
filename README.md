@@ -1,13 +1,10 @@
-# Tótu Vinnutími PRO v1.1
+# Tótu Vinnutími PRO v1.2
 
-Regla:
-- Tekið hlé = engin breyting á greiddum tíma
-- Sleppt hlé = hléið bætist við greiddan tíma
+Nýtt:
+- Kennitala
+- Starfsnúmer
+- Tímakaup
+- Áætluð laun í mánaðaryfirliti
+- Betri CSV/Excel fyrir laun
 
-## Uppsetning
-1. Keyrðu `supabase-setup.sql` í Supabase SQL Editor.
-2. Hladdu skránum í GitHub.
-3. Netlify uppfærir síðuna sjálfkrafa.
-
-## Stjórnandi
-Lykilorð: `Brynjak`
+Stjórnandalykilorð: `Brynjak`

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Tótu Vinnutími PRO v1.1</title>
+<title>Tótu Vinnutími PRO v1.2</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <meta name="theme-color" content="#0091ff">
@@ -28,7 +28,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;bor
 <body>
 <div class="wrap">
   <div class="top">
-    <div class="brand"><img class="logo" src="icon-192.png"><div class="title"><h1>Tótu Vinnutími PRO</h1><p>v1.1 — sleppt hlé bætist við greiddan tíma</p></div></div>
+    <div class="brand"><img class="logo" src="icon-192.png"><div class="title"><h1>Tótu Vinnutími PRO</h1><p>v1.2 — laun, kennitala og betra mánaðaryfirlit</p></div></div>
     <button class="secondary" onclick="toggleAdmin()">Stjórnandi</button>
   </div>
 
@@ -92,7 +92,13 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;bor
 
         <div id="tab-employees" class="hidden">
           <h3>Bæta við starfsmanni</h3>
-          <div class="row"><input id="newEmployee" placeholder="Nafn starfsmanns"><button onclick="addEmployee()">Bæta við</button></div>
+          <label>Nafn</label><input id="newEmployee" placeholder="Nafn starfsmanns">
+          <div class="row">
+            <div style="flex:1"><label>Kennitala</label><input id="newNationalId" placeholder="000000-0000"></div>
+            <div style="flex:1"><label>Starfsnúmer</label><input id="newEmployeeNo" placeholder="t.d. 001"></div>
+            <div style="flex:1"><label>Tímakaup</label><input id="newHourlyRate" type="number" placeholder="kr á klst"></div>
+          </div>
+          <button style="margin-top:12px" onclick="addEmployee()">Bæta við</button>
           <h3>Starfsmenn</h3><div id="employeesList"></div>
         </div>
 
@@ -214,8 +220,12 @@ function renderSummary(){
     const otAfter = Number(settings.overtime_after_hours_day||8)*60;
     if(paid>otAfter) map[n].overtime += (paid-otAfter);
   });
-  const rows = Object.entries(map).sort().map(([n,s])=>`<tr><td>${n}</td><td>${s.days.size}</td><td>${minsText(s.real)}</td><td><b>${minsText(s.paid)}</b></td><td>${minsText(s.skipped)}</td><td>${minsText(s.overtime)}</td><td>${s.sf}/${s.ss}/${s.sl}</td><td>${s.abs}</td></tr>`).join("");
-  $("summary").innerHTML = `<div class="tablewrap"><table><thead><tr><th>Starfsmaður</th><th>Dagar</th><th>Rauntími</th><th>Greiddur tími</th><th>Sleppt hlé</th><th>Yfirvinna</th><th>Sleppt F/S/M</th><th>Fjarvistir</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  const rows = Object.entries(map).sort().map(([n,s])=>{
+    const emp = employees.find(e=>e.name===n) || {};
+    const wage = Math.round((Number(emp.hourly_rate||0) * s.paid) / 60);
+    return `<tr><td>${n}</td><td>${s.days.size}</td><td>${minsText(s.real)}</td><td><b>${minsText(s.paid)}</b></td><td>${minsText(s.skipped)}</td><td>${minsText(s.overtime)}</td><td><b>${wage.toLocaleString("is-IS")} kr</b></td><td>${s.sf}/${s.ss}/${s.sl}</td><td>${s.abs}</td></tr>`;
+  }).join("");
+  $("summary").innerHTML = `<div class="tablewrap"><table><thead><tr><th>Starfsmaður</th><th>Dagar</th><th>Rauntími</th><th>Greiddur tími</th><th>Sleppt hlé</th><th>Yfirvinna</th><th>Áætluð laun</th><th>Sleppt F/S/M</th><th>Fjarvistir</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 async function clockIn(){
   const id=$("employeeSelect").value; const emp=employees.find(e=>e.id===id); if(!emp) return;
@@ -253,8 +263,26 @@ function toggleAdmin(){ $("admin").classList.toggle("hidden"); }
 function adminLogin(){ if($("adminPass").value===ADMIN_PASSWORD){$("loginBox").classList.add("hidden");$("adminPanel").classList.remove("hidden"); toast("Stjórnandi skráður inn");} else toast("Rangt lykilorð");}
 function adminLogout(){ $("loginBox").classList.remove("hidden");$("adminPanel").classList.add("hidden");}
 function tab(name,btn){ ["overview","employees","manual","settings","backup"].forEach(x=>$("tab-"+x).classList.toggle("hidden",x!==name)); document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); }
-async function addEmployee(){ const name=$("newEmployee").value.trim(); if(!name) return; const {error}=await sb.from("employees").insert({name,active:true}); if(error){toast("Villa");console.error(error);return;} $("newEmployee").value=""; toast("Starfsmaður bættur við"); await loadEmployees();}
-async function renameEmployee(id,old){ const name=prompt("Nýtt nafn:",old); if(!name) return; await sb.from("employees").update({name}).eq("id",id); toast("Nafni breytt"); await loadEmployees(); await loadEntries();}
+async function addEmployee(){
+  const name=$("newEmployee").value.trim(); if(!name) return;
+  const national_id=$("newNationalId").value.trim();
+  const employee_no=$("newEmployeeNo").value.trim();
+  const hourly_rate=Number($("newHourlyRate").value||0);
+  const {error}=await sb.from("employees").insert({name,active:true,national_id,employee_no,hourly_rate});
+  if(error){toast("Villa");console.error(error);return;}
+  $("newEmployee").value=""; $("newNationalId").value=""; $("newEmployeeNo").value=""; $("newHourlyRate").value="";
+  toast("Starfsmaður bættur við"); await loadEmployees();
+}
+async function editEmployee(id){
+  const emp=employees.find(e=>e.id===id); if(!emp) return;
+  const name=prompt("Nafn:", emp.name); if(!name) return;
+  const national_id=prompt("Kennitala:", emp.national_id||"") ?? emp.national_id;
+  const employee_no=prompt("Starfsnúmer:", emp.employee_no||"") ?? emp.employee_no;
+  const hourly_rate=Number(prompt("Tímakaup:", emp.hourly_rate||0) ?? emp.hourly_rate ?? 0);
+  const {error}=await sb.from("employees").update({name,national_id,employee_no,hourly_rate}).eq("id",id);
+  if(error){toast("Villa við breytingu"); console.error(error); return;}
+  toast("Starfsmanni breytt"); await loadEmployees(); await loadEntries();
+}
 async function deleteEmployee(id){ if(!confirm("Eyða starfsmanni af lista? Gamlar skráningar geymast.")) return; await sb.from("employees").update({active:false}).eq("id",id); toast("Starfsmaður falinn"); await loadEmployees();}
 async function addManual(){
   const id=$("manualEmployee").value, emp=employees.find(e=>e.id===id), date=$("manualDate").value, tin=$("manualIn").value, tout=$("manualOut").value;
@@ -276,13 +304,18 @@ async function saveSettings(){
 }
 function csvEscape(v){ return `"${String(v??"").replaceAll('"','""')}"`; }
 function downloadCSV(){
-  const header=["Starfsmaður","Mætti","Fór","Raun mín","Greiddar mín","Greiddur tími","Sleppt hlé mín","Fyrra kaffi tekið","Seinna kaffi tekið","Matur tekinn","Athugasemd","Fjarvist"];
-  const rows=entries.map(e=>[e.employee_name,fmtDate(e.clock_in),fmtDate(e.clock_out),e.total_minutes,e.paid_minutes ?? e.total_minutes,minsText(e.paid_minutes ?? e.total_minutes),e.skipped_break_minutes,e.first_coffee?"Já":"Nei",e.second_coffee?"Já":"Nei",e.lunch?"Já":"Nei",e.note,e.absence_type].map(csvEscape).join(";"));
+  const header=["Kennitala","Starfsnúmer","Starfsmaður","Mætti","Fór","Raun mín","Greiddar mín","Greiddur tími","Sleppt hlé mín","Tímakaup","Áætluð laun","Fyrra kaffi tekið","Seinna kaffi tekið","Matur tekinn","Athugasemd","Fjarvist"];
+  const rows=entries.map(e=>{
+    const emp = employees.find(x=>x.id===e.employee_id || x.name===e.employee_name) || {};
+    const paid = Number(e.paid_minutes ?? e.total_minutes ?? 0);
+    const wage = Math.round((Number(emp.hourly_rate||0) * paid) / 60);
+    return [emp.national_id,emp.employee_no,e.employee_name,fmtDate(e.clock_in),fmtDate(e.clock_out),e.total_minutes,paid,minsText(paid),e.skipped_break_minutes,emp.hourly_rate||0,wage,e.first_coffee?"Já":"Nei",e.second_coffee?"Já":"Nei",e.lunch?"Já":"Nei",e.note,e.absence_type].map(csvEscape).join(";");
+  });
   const blob=new Blob(["\ufeff"+header.join(";")+"\n"+rows.join("\n")],{type:"text/csv;charset=utf-8"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="totu-vinnutimi-v11.csv"; a.click();
 }
 function copyPayroll(){
-  const lines=[...document.querySelectorAll("#summary tbody tr")].map(tr=>{const t=[...tr.children].map(td=>td.textContent); return `${t[0]} – greiddur tími ${t[3]} (sleppt hlé ${t[4]}, yfirvinna ${t[5]})`;});
+  const lines=[...document.querySelectorAll("#summary tbody tr")].map(tr=>{const t=[...tr.children].map(td=>td.textContent); return `${t[0]} – greiddur tími ${t[3]} – áætluð laun ${t[6]} (sleppt hlé ${t[4]}, yfirvinna ${t[5]})`;});
   navigator.clipboard.writeText(lines.join("\n")); toast("Launalisti afritaður");
 }
 async function backup(){
