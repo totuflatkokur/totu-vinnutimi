@@ -1,26 +1,13 @@
-# Tótu Vinnutími
+# Tótu Vinnutími PRO v1.1
 
-Tímaskráningarkerfi fyrir Tótu Flatkökur.
+Regla:
+- Tekið hlé = engin breyting á greiddum tíma
+- Sleppt hlé = hléið bætist við greiddan tíma
 
 ## Uppsetning
-
 1. Keyrðu `supabase-setup.sql` í Supabase SQL Editor.
-2. Settu allar skrárnar úr þessari möppu í GitHub repository.
-3. Netlify birtir síðuna sjálfkrafa.
+2. Hladdu skránum í GitHub.
+3. Netlify uppfærir síðuna sjálfkrafa.
 
 ## Stjórnandi
-
 Lykilorð: `Brynjak`
-
-## Inniheldur
-
-- Mæta / Fara heim
-- Fyrra kaffi, seinna kaffi og hádegismatur
-- Stillanlegar mínútur fyrir hlé
-- Starfsmenn
-- Handvirkar tímaskráningar
-- Fjarvistir
-- Mánaðaryfirlit
-- CSV/Excel útflutningur
-- Backup JSON
-- PWA app-tákn

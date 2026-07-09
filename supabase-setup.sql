@@ -1,6 +1,5 @@
-
--- Tótu Vinnutími - örugg uppfærsla á Supabase gagnagrunni
--- Þessi kóði eyðir EKKI gömlum tímaskráningum.
+-- Tótu Vinnutími v1.1
+-- Örugg uppfærsla. Eyðir EKKI gömlum gögnum.
 
 create table if not exists employees (
   id uuid primary key default gen_random_uuid(),
@@ -17,6 +16,8 @@ create table if not exists time_entries (
   clock_in timestamptz,
   clock_out timestamptz,
   total_minutes integer,
+  paid_minutes integer,
+  skipped_break_minutes integer default 0,
   note text,
   first_coffee boolean default false,
   second_coffee boolean default false,
@@ -33,21 +34,24 @@ create table if not exists app_settings (
   updated_at timestamptz default now()
 );
 
-insert into app_settings (key, value) values
-('first_coffee_minutes', '15'),
-('second_coffee_minutes', '15'),
-('lunch_minutes', '30'),
-('overtime_after_hours_day', '8')
-on conflict (key) do nothing;
-
 alter table employees add column if not exists active boolean default true;
 alter table employees add column if not exists hourly_rate numeric default 0;
+
+alter table time_entries add column if not exists paid_minutes integer;
+alter table time_entries add column if not exists skipped_break_minutes integer default 0;
 alter table time_entries add column if not exists first_coffee boolean default false;
 alter table time_entries add column if not exists second_coffee boolean default false;
 alter table time_entries add column if not exists lunch boolean default false;
 alter table time_entries add column if not exists break_minutes integer default 0;
 alter table time_entries add column if not exists manual boolean default false;
 alter table time_entries add column if not exists absence_type text;
+
+insert into app_settings (key, value) values
+('first_coffee_minutes', '15'),
+('second_coffee_minutes', '15'),
+('lunch_minutes', '30'),
+('overtime_after_hours_day', '8')
+on conflict (key) do nothing;
 
 alter table employees enable row level security;
 alter table time_entries enable row level security;
